@@ -1,0 +1,17 @@
+ {
+        "personalInformation": {
+            "lastName": "Nielsen2",
+            "companyName": "E-ffoc",
+            "email": "ulrichN2@effoc.com",
+            "phone": "+494341927420"
+        },
+        "address": [
+            {
+                "street": "Steinbrueckstrasse",
+                "houseNumber": 114,
+                "city": "Nuremberg",
+                "country": "Germany",
+                "postalCode": "90408"
+            }
+        ]
+}

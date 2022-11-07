@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:azure-cosmos-db-connector-mule-4="http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4" xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4 http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4/current/mule-azure-cosmos-db-connector-mule-4.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+	
+	 <http:listener-config name="customer-api--httpListenerConfig">
+        <http:listener-connection host="${secure::http.api.host}" port="${secure::http.api.port}" />
+    </http:listener-config>
+    <apikit:config name="customers-api-config" api="resource::c5dfaf05-939d-43d0-b835-1fd2ca86adb2:customer-api:1.0.0:raml:zip:customers-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="1024882f-5ccf-4768-9210-5849084a270c" file="config\customer-api-config.yaml" key="${encryptionKey}" />
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="f03a3a6b-9c76-437e-ac1b-c45e434e6e0c" >
+		<salesforce:basic-connection username="${secure::salesforce.userName}" password="${secure::salesforce.password}" securityToken="${secure::salesforce.securityToken}" />
+	</salesforce:sfdc-config>
+	<tls:context name="Azure_cosmos_TLS_Context" doc:name="TLS Context" doc:id="896a7143-332e-4428-9fc7-07a874737f62" >
+		<tls:trust-store path="${secure::azure.cosmos.security.trustStorePath}" password="${secure::azure.cosmos.security.trustStorePassword}" />
+	</tls:context>
+	<azure-cosmos-db-connector-mule-4:key-token-config name="Azure_Cosmos_Db_Key_Token_Config" doc:name="Azure Cosmos Db Key Token Config" doc:id="54097c26-176d-4a9f-8b0f-1503dbd73da8" >
+		<azure-cosmos-db-connector-mule-4:key-token-auth-connection baseUri="${secure::azure.cosmos.db.url}" key="${secure::azure.cosmos.db.key}" version="${secure::azure.cosmos.db.version}" tlsContext="Azure_cosmos_TLS_Context"/>
+	</azure-cosmos-db-connector-mule-4:key-token-config>
+<!-- 	<api-gateway:autodiscovery apiId="${secure::api.id}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="d77fab21-3027-4ccb-9dc8-f592b6082ccb" flowRef="customers-api-main" /> -->
+	<error-handler name="global-configurationError_Handler" doc:id="a6e1b042-7626-48ec-9c80-923078a9bf30" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="def16fab-1bdc-4f1c-a1c1-129d7e0c4870" type="AZURE-COSMOS-DB-CONNECTOR-MULE-4:NOT_FOUND">
+			<set-variable value="404" doc:name="Set Variable" doc:id="41fc2bbb-b912-4af9-805f-d800d156d6c8" variableName="httpStatus"/>
+			<ee:transform doc:name="Transform Message" doc:id="87200237-9425-4a13-a1fc-1e4d92156ff5" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "customer not found with given Id."
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+
+		</on-error-propagate>
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="40dd57bd-a348-4aa3-965f-78bb6fc8acc9" >
+			<set-variable value="500" doc:name="Set Variable" doc:id="5afd0af0-119e-402c-9ff6-607b94dcbf00" variableName="httpStatus"/>
+			<ee:transform doc:name="Transform Message" doc:id="eb0fbea3-2b6f-4046-9361-7c6b2b578ea0">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "System unable to process the request. Please try after sometime."
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</on-error-continue>
+		
+		
+	</error-handler>
+	
+</mule>

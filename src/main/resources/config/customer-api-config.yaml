@@ -1,0 +1,27 @@
+api:
+  id: "18286765"
+
+http:
+  api:
+    host: "0.0.0.0"
+    port: "8081"
+    basePath: "/api/*"
+  
+
+#azure cosmos db configuration.
+azure:
+  cosmos:
+    db:
+      url: "https://localhost:8082"
+      key: "![J8N18zrkvllyFBU1Qspy8hpp+zq9A6bIwg1oRWCzNhITTBy7N1BNJulPFDH+JY3tYdECbFpwRU4BK3Qz8gVdDHYxwm9o0eb1FDq+qQtq2obwkd/YjS2MI2aVnl8b+X98]"
+      version: "2018-12-31"
+    security:
+      trustStorePath: "certs/cdb_TrustStore.jks"
+      trustStorePassword:  "![qx5TzVoHtcz3Zdh2b7ejCw==]"
+
+#Salesforce configruation.              
+salesforce:
+  userName: "sateeshvoodi-d6a61@force.com"
+  password: "![qx5TzVoHtcz3Zdh2b7ejCw==]"
+  securityToken: "![B8v3+6omq63AAqkj/5O40Y99UEpFqJB4ZfYg9RYq0VE=]"
+

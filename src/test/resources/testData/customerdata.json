@@ -1,0 +1,24 @@
+{
+    "id": "8a02f60b-1739-4eab-9652-fe9fcbd6d2bb",
+    "personalInformation": {
+        "firstName": "Ulrich2",
+        "lastName": "Nielsen2",
+        "companyName": "E-ffoc",
+        "email": "ulrichN1@effoc.com",
+        "phone": "+494341927424"
+    },
+    "address": [
+        {
+            "street": "Steinbrueckstrasse",
+            "houseNumber": 114,
+            "city": "Nuremberg",
+            "country": "Germany",
+            "postalCode": "90408"
+        }
+    ],
+    "_rid": "xPtPAPy2cL0BAAAAAAAAAA==",
+    "_self": "dbs/xPtPAA==/colls/xPtPAPy2cL0=/docs/xPtPAPy2cL0BAAAAAAAAAA==/",
+    "_etag": "\"00000000-0000-0000-f203-59ea474201d8\"",
+    "_attachments": "attachments/",
+    "_ts": 1667754921
+}

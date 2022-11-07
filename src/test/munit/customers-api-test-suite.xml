@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="customers-api-test-suite.xml" />
+	<global-property doc:name="Global Property" doc:id="f90c06b2-c184-4824-8d2e-58d33ab6908b" name="encryptionKey" value="Kn@ufG3rm@NyC0mp" />
+	<munit:test name="customers-api-test-suite-get:\customer\(Id):customer-api-configTest" doc:id="eb32f06c-8b88-41ea-b494-612b4c9e995d" description="get customer success test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="cosmos db get document mock" doc:id="cf376ba7-f8ee-4786-b7da-c3e6822f9f22" processor="azure-cosmos-db-connector-mule-4:get-document">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Get Document" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="62f43d20-800b-4351-9ffd-e7e394480dbf" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="Azure_Cosmos_Db_Key_Token_Config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="customerDB" attributeName="dbIdUriParam" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://testData/customerdata.json')]" mediaType="application/java" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="31da6dc7-17c4-4379-a006-133fd03e2fe8" >
+				<munit:attributes value="#[readUrl('classpath://testData/uriParams.json')]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to get:\customer\(Id):customer-api-config" doc:id="955013b1-a668-4e29-9812-d676c563d76a" name="get:\customers\(Id):customers-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="875d2244-ca5f-47f3-9310-ff9fd7c65f52" is="#[MunitTools::notNullValue()]" message="customerId should not be null" expression="#[payload.customerId]"/>
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="4afd9f53-9aca-452b-821c-7249bd63c399" actual="#[payload.customerId]" expected="8a02f60b-1739-4eab-9652-fe9fcbd6d2bb" message="customerId not matched"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="customers-api-test-suite-get:\customer\(Id):customer-api-failure-configTest" doc:id="bcb7a175-e69d-4042-8038-cf1ba590cd03" description="get customer failure test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="cosmos db get document mock" doc:id="b94f03c1-4731-4958-a03e-5ca04c2915a3" processor="azure-cosmos-db-connector-mule-4:get-document">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="62f43d20-800b-4351-9ffd-e7e394480dbf" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="AZURE-COSMOS-DB-CONNECTOR-MULE-4:NOT_FOUND" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="d173873a-c037-488a-9ff8-feae6c3cd150" >
+				<munit:attributes value="#[readUrl('classpath://testData/uriParams.json')]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to get:\customer\(Id):customer-api-config" doc:id="ec8ea086-0488-4449-b60c-4026fb9e2d18" name="get:\customers\(Id):customers-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="20a74508-0697-4ccc-b562-d1cdc3879ea2" is="#[MunitTools::notNullValue()]" message="customerId should not be null" expression="#[vars.httpStatus]"/>
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="2a56029c-7788-4cc4-b328-2ff8e36245bd" actual="#[vars.httpStatus]" expected="404" message="Invalid status code"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="customers-api-test-suite-post:\customer:application\json:customer-api-fail-configTest" doc:id="4161c525-2307-46c2-b33e-4090a2ffc554" description="create customer fail test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="cosmos db call mock " doc:id="7158b16e-be75-429b-9a5d-6b7edb274c7a" processor="azure-cosmos-db-connector-mule-4:create-document">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Create customer in Azure Cosmos DB" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="AZURE-COSMOS-DB-CONNECTOR-MULE-4:INTERNAL_SERVER_ERROR" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="5369a8d3-7f8e-4819-9aa7-59b13188e27e" >
+				<munit:payload value="#[readUrl('classpath://testData/customerdata.json')]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\customer:application\json:customer-api-config" doc:id="ed5408ec-f16d-4ad1-b9c6-7a8bd68f24ad" name="post:\customers:application\json:customers-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="fa4aafda-8bef-4adb-bf5a-ceeb11167c9b" actual="#[vars.httpStatus]" expected="500" message="http status value is incorrect"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="customers-api-test-suite-post:\customer:application\json:customer-api-configTest" doc:id="bd2827ec-e5e7-4945-b9ea-fd42981d1f1c" description="create customer sucess test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="cosmos db call mock " doc:id="7d5f36e9-a249-4346-9d62-387ddcc36161" processor="azure-cosmos-db-connector-mule-4:create-document">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Create customer in Azure Cosmos DB" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://testData/customerdata.json')]" mediaType="application/java" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="salesforce create customer call mock" doc:id="cdb46abd-5248-4280-8cf2-4cdab0e03d68" processor="salesforce:create">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="8a02f60b-1739-4eab-9652-fe9fcbd6d2bb" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[readUrl("classpath://testData/salesforce-customer-response.json")]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="a5a3ca9c-eb33-4365-b208-9dbd12c10187" >
+				<munit:payload value="#[readUrl('classpath://testData/customerdata.json')]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\customer:application\json:customer-api-config" doc:id="8349d038-c428-4d5a-a22e-9f4dbdeea766" name="post:\customers:application\json:customers-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="b3ca2b50-0ad6-4ad4-8650-b55d0f05ec3d" actual="#[payload.message]" expected="customer created successfully" message="Response message is not matched"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="customers-api-test-suite-put:\customer\(Id):application\json:customer-api-update-configTest" doc:id="0ea33cd3-22ed-429f-bff2-d4d0d1524eca" description="update customer data success test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when azure cosmos db connector execute" doc:id="178ff198-2af3-4c00-82a4-2cc60286fd0a" processor="azure-cosmos-db-connector-mule-4:replace-document">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Replace Document" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="75e49874-9be5-4bb9-96b0-083f662a1fef" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="Azure_Cosmos_Db_Key_Token_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[readUrl("classpath://testData/customerData.json")]' mediaType="application/java" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock salesforce call" doc:id="9230f51b-8e8e-48b7-9438-bf7bc9889043" processor="salesforce:upsert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="customer__C" attributeName="objectType" />
+					<munit-tools:with-attribute whereValue="Upsert" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="d207c348-fc00-45e3-9142-505931a76201" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[readUrl("classpath://testData/salesforce-customer-response.json")]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="c1e1dba4-8ed7-4ea8-bf62-1edc805d928b" >
+				<munit:payload value="#[readUrl('classpath://testData/customerRequest.json')]" />
+				<munit:attributes value='#[readUrl("classpath://testData/uriParams.json")]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to put:\customer\(Id):application\json:customer-api-config" doc:id="2a05c47f-7a7c-4fa9-bb67-6b29a4f1be7e" name="put:\customers\(Id):application\json:customers-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="b70c2835-8845-4f01-9168-fb26a2b39b73" actual="#[payload.message]" expected="customer updated successfully" message="response message not matched."/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="customers-api-test-suite-put:\customer\(Id):application\json:customer-api-update-failure-configTest" doc:id="e905e7e6-76b2-45e7-bea9-5d763d193f1c" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="81c6674b-8990-4dd0-9774-e13524bd0460" processor="azure-cosmos-db-connector-mule-4:replace-document">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Replace Document" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="75e49874-9be5-4bb9-96b0-083f662a1fef" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="AZURE-COSMOS-DB-CONNECTOR-MULE-4:CONNECTIVITY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="2dcf9bd8-7ed6-4b4e-a52d-8357aa3627f7" >
+				<munit:payload value="#[readUrl('classpath://testData/customerRequest.json')]" />
+				<munit:attributes value='#[readUrl("classpath://testData/uriParams.json")]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to put:\customer\(Id):application\json:customer-api-config" doc:id="4dfcd4fb-8630-4125-9bf4-8d33033717c1" name="put:\customers\(Id):application\json:customers-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="eb8f57d1-f15c-4d93-a6da-021a60f11ffa" actual="#[vars.httpStatus]" expected="500" message="Invalid status code"/>
+		</munit:validation>
+	</munit:test>
+	
+
+
+</mule>

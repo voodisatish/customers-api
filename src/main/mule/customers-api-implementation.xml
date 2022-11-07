@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:azure-cosmos-db-connector-mule-4="http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4 http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4/current/mule-azure-cosmos-db-connector-mule-4.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="create-customer-implementation-flow" doc:id="54f3184c-aba0-4dc6-81fa-05d8584b2689" >
+		<ee:transform doc:name="Transform Message" doc:id="ec824199-cc07-48b1-a66c-15e5478f53c1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{"id": uuid()} ++ payload ]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<azure-cosmos-db-connector-mule-4:create-document doc:name="Create customer in Azure Cosmos DB" doc:id="181808f0-154d-4680-ac59-028451ed87d5" config-ref="Azure_Cosmos_Db_Key_Token_Config" dbIdUriParam="customerDB" collIdUriParam="customer" xMsDocumentdbPartitionkeyHeader="#['[&quot;' ++ payload.id ++ '&quot;]']" >
+		</azure-cosmos-db-connector-mule-4:create-document>
+		<logger level="INFO" doc:name="Logger" doc:id="1ef77191-757d-49be-bd80-62914bb0c98e" message="Customer added in Azure cosmos DB." />
+		<ee:transform doc:name="Transform Message" doc:id="d204d6a4-e3c0-460f-a449-fdb6b29047a1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+import modules::sfCustomer as cust
+---
+[cust::customer(payload)]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:create type="customer__C" doc:name="Create customer in Salesforce" doc:id="bac0cf31-0388-4bdd-bf66-200c5afb607c" config-ref="Salesforce_Config" />
+		<logger level="INFO" doc:name="Logger" doc:id="cc46adec-8bb7-42a9-8929-7f652cdac889" message="Customer added in salesforce." />
+		<ee:transform doc:name="Transform Message" doc:id="98e75231-c23c-46e6-84a7-b0d774e7392e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  message: "customer created successfully"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler ref="global-configurationError_Handler" />
+	</flow>
+	<flow name="update-customer-implementation-flow" doc:id="555fe7c4-620d-46ff-8601-6897aa2142be" >
+		<ee:transform doc:name="Transform Message" doc:id="a2e7e387-1326-452f-bb6a-8868e6e437ca">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{"id": attributes.uriParams.Id} ++ payload ]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<azure-cosmos-db-connector-mule-4:replace-document doc:name="Replace Document" doc:id="75e49874-9be5-4bb9-96b0-083f662a1fef" config-ref="Azure_Cosmos_Db_Key_Token_Config" dbIdUriParam="customerDB" collIdUriParam="customer" docIdUriParam="#[attributes.uriParams.Id]" xMsDocumentdbPartitionkeyHeader="#['[&quot;' ++ attributes.uriParams.Id ++ '&quot;]']"/>
+		<logger level="INFO" doc:name="Logger" doc:id="bf06e3df-3ec8-44c5-8abe-abf166feeed1" message='#["Customer updated successfully in Azure cosmos db"]'/>
+		<ee:transform doc:name="Transform Message" doc:id="bd8f8ea9-088c-4455-9a06-2692fc5a3831" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+import modules::sfCustomer as cust
+---
+[cust::customer(payload)]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:upsert objectType="customer__C" doc:name="Upsert" doc:id="d207c348-fc00-45e3-9142-505931a76201" config-ref="Salesforce_Config" externalIdFieldName="customerId__c"/>
+		<logger level="INFO" doc:name="Logger" doc:id="c3bb0a9d-280a-4c1e-86ba-2c98ce6186ba" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="a7dfe9dc-8528-4174-b6df-14084e8c13d8" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  message: "customer updated successfully"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler ref="global-configurationError_Handler" />
+	</flow>
+	<flow name="get-customer-flow" doc:id="16023f0b-6b50-4ff8-a5b9-7a652a5a90da" >
+		<azure-cosmos-db-connector-mule-4:get-document doc:name="Get Document" doc:id="62f43d20-800b-4351-9ffd-e7e394480dbf" config-ref="Azure_Cosmos_Db_Key_Token_Config" dbIdUriParam="customerDB" collIdUriParam="customer" docIdUriParam="#[attributes.uriParams.Id]" xMsDocumentdbPartitionkeyHeader="#['[&quot;' ++ attributes.uriParams.Id ++ '&quot;]']"/>
+		<ee:transform doc:name="Transform Message" doc:id="13965012-95e5-4433-b0ff-f7941391c684" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+ customerId: payload.id,
+ personalInformation: payload.personalInformation,
+ address: payload.address
+
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler ref="global-configurationError_Handler" />
+	</flow>
+</mule>
