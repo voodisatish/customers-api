@@ -30,11 +30,11 @@ http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/m
 	</azure-cosmos-db-connector-mule-4:key-token-config>
  	<api-gateway:autodiscovery apiId="${secure::api.id}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="d77fab21-3027-4ccb-9dc8-f592b6082ccb" flowRef="customers-api-main" />
 	<error-handler name="global-configurationError_Handler" doc:id="a6e1b042-7626-48ec-9c80-923078a9bf30" >
-		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="def16fab-1bdc-4f1c-a1c1-129d7e0c4870" type="AZURE-COSMOS-DB-CONNECTOR-MULE-4:NOT_FOUND">
-			<set-variable value="404" doc:name="Set Variable" doc:id="41fc2bbb-b912-4af9-805f-d800d156d6c8" variableName="httpStatus"/>
-			<ee:transform doc:name="Transform Message" doc:id="87200237-9425-4a13-a1fc-1e4d92156ff5" >
-				<ee:message >
-					<ee:set-payload ><![CDATA[%dw 2.0
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="f14e45ab-ffda-4bf2-aea9-25d899bd813a" type="AZURE-COSMOS-DB-CONNECTOR-MULE-4:NOT_FOUND">
+			<set-variable value="404" doc:name="Set Variable" doc:id="41fc2bbb-b912-4af9-805f-d800d156d6c8" variableName="httpStatus" />
+			<ee:transform doc:name="Transform Message" doc:id="87200237-9425-4a13-a1fc-1e4d92156ff5">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 {
@@ -42,10 +42,9 @@ output application/json
 }]]></ee:set-payload>
 				</ee:message>
 			</ee:transform>
-
 		</on-error-propagate>
-		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="40dd57bd-a348-4aa3-965f-78bb6fc8acc9" >
-			<set-variable value="500" doc:name="Set Variable" doc:id="5afd0af0-119e-402c-9ff6-607b94dcbf00" variableName="httpStatus"/>
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="287c5f32-2d3a-4af3-9106-be59087e56a9" >
+			<set-variable value="500" doc:name="Set Variable" doc:id="5afd0af0-119e-402c-9ff6-607b94dcbf00" variableName="httpStatus" />
 			<ee:transform doc:name="Transform Message" doc:id="eb0fbea3-2b6f-4046-9361-7c6b2b578ea0">
 				<ee:message>
 					<ee:set-payload><![CDATA[%dw 2.0

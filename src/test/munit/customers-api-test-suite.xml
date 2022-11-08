@@ -34,7 +34,7 @@
 			<munit-tools:assert-equals doc:name="Assert equals" doc:id="4afd9f53-9aca-452b-821c-7249bd63c399" actual="#[payload.customerId]" expected="8a02f60b-1739-4eab-9652-fe9fcbd6d2bb" message="customerId not matched"/>
 		</munit:validation>
 	</munit:test>
-	<munit:test name="customers-api-test-suite-get:\customer\(Id):customer-api-failure-configTest" doc:id="bcb7a175-e69d-4042-8038-cf1ba590cd03" description="get customer failure test">
+	<munit:test name="customers-api-test-suite-get:\customer\(Id):customer-api-failure-configTest" doc:id="bcb7a175-e69d-4042-8038-cf1ba590cd03" description="get customer failure test" expectedErrorType="AZURE-COSMOS-DB-CONNECTOR-MULE-4:NOT_FOUND">
 		<munit:behavior >
 			<munit-tools:mock-when doc:name="cosmos db get document mock" doc:id="b94f03c1-4731-4958-a03e-5ca04c2915a3" processor="azure-cosmos-db-connector-mule-4:get-document">
 				<munit-tools:with-attributes >
