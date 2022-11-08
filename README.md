@@ -38,7 +38,8 @@ Anypoint exchange Uri: https://anypoint.mulesoft.com/exchange/c5dfaf05-939d-43d0
   11. Once API added in API manager. Copy the API Instance ID. <br />
   12. Configure API Instance ID to auto discovery configuration in mule api. <br />
   13. Add basic authorization security policy to Customer API in policies section. <br />
-  14. Login to Runtime manager and deploy customer-api application. we can also use mule maven plugin to deploy api to cloud hub. <br />
+  14. Login to Runtime manager and deploy customer-api application. we can also use mule maven plugin to deploy api to cloud hub with maven command  <br />
+          mvn deploy -DmuleDeploy -Dusername=<userName> -Dpassword=<password>. <br />
   15. We can apply circuit breaker custom policy to stop traffic if the backend services are down. <br />
   16. Created alerts to notify user if there is slow and no response from the service in Runtime manager.
   
