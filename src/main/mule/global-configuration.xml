@@ -28,9 +28,9 @@ http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/m
 	<azure-cosmos-db-connector-mule-4:key-token-config name="Azure_Cosmos_Db_Key_Token_Config" doc:name="Azure Cosmos Db Key Token Config" doc:id="54097c26-176d-4a9f-8b0f-1503dbd73da8" >
 		<azure-cosmos-db-connector-mule-4:key-token-auth-connection baseUri="${secure::azure.cosmos.db.url}" key="${secure::azure.cosmos.db.key}" version="${secure::azure.cosmos.db.version}" tlsContext="Azure_cosmos_TLS_Context"/>
 	</azure-cosmos-db-connector-mule-4:key-token-config>
-<!-- 	<api-gateway:autodiscovery apiId="${secure::api.id}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="d77fab21-3027-4ccb-9dc8-f592b6082ccb" flowRef="customers-api-main" /> -->
+ 	<api-gateway:autodiscovery apiId="${secure::api.id}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="d77fab21-3027-4ccb-9dc8-f592b6082ccb" flowRef="customers-api-main" />
 	<error-handler name="global-configurationError_Handler" doc:id="a6e1b042-7626-48ec-9c80-923078a9bf30" >
-		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="def16fab-1bdc-4f1c-a1c1-129d7e0c4870" type="AZURE-COSMOS-DB-CONNECTOR-MULE-4:NOT_FOUND">
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="def16fab-1bdc-4f1c-a1c1-129d7e0c4870" type="AZURE-COSMOS-DB-CONNECTOR-MULE-4:NOT_FOUND">
 			<set-variable value="404" doc:name="Set Variable" doc:id="41fc2bbb-b912-4af9-805f-d800d156d6c8" variableName="httpStatus"/>
 			<ee:transform doc:name="Transform Message" doc:id="87200237-9425-4a13-a1fc-1e4d92156ff5" >
 				<ee:message >

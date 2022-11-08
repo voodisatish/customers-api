@@ -41,7 +41,7 @@
 					<munit-tools:with-attribute whereValue="62f43d20-800b-4351-9ffd-e7e394480dbf" attributeName="doc:id" />
 				</munit-tools:with-attributes>
 				<munit-tools:then-return >
-					<munit-tools:error typeId="AZURE-COSMOS-DB-CONNECTOR-MULE-4:NOT_FOUND" />
+					<munit-tools:error typeId=" AZURE-COSMOS-DB-CONNECTOR-MULE-4:NOT_FOUND" />
 				</munit-tools:then-return>
 			
 </munit-tools:mock-when>
@@ -54,7 +54,7 @@
 		</munit:execution>
 		<munit:validation >
 			<munit-tools:assert-that doc:name="Assert that" doc:id="20a74508-0697-4ccc-b562-d1cdc3879ea2" is="#[MunitTools::notNullValue()]" message="customerId should not be null" expression="#[vars.httpStatus]"/>
-			<munit-tools:assert-equals doc:name="Assert equals" doc:id="2a56029c-7788-4cc4-b328-2ff8e36245bd" actual="#[vars.httpStatus]" expected="404" message="Invalid status code"/>
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="2a56029c-7788-4cc4-b328-2ff8e36245bd" actual="#[vars.httpStatus]" expected="500" message="Invalid status code"/>
 		</munit:validation>
 	</munit:test>
 	<munit:test name="customers-api-test-suite-post:\customer:application\json:customer-api-fail-configTest" doc:id="4161c525-2307-46c2-b33e-4090a2ffc554" description="create customer fail test">
@@ -64,7 +64,7 @@
 					<munit-tools:with-attribute whereValue="Create customer in Azure Cosmos DB" attributeName="doc:name" />
 				</munit-tools:with-attributes>
 				<munit-tools:then-return >
-					<munit-tools:error typeId="AZURE-COSMOS-DB-CONNECTOR-MULE-4:INTERNAL_SERVER_ERROR" />
+					<munit-tools:error typeId="AZURE-COSMOS-DB-CONNECTOR-MULE-4:CONNECTIVITY" />
 				</munit-tools:then-return>
 			</munit-tools:mock-when>
 		</munit:behavior>
