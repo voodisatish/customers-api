@@ -38,7 +38,7 @@ Anypoint exchange Uri: https://anypoint.mulesoft.com/exchange/c5dfaf05-939d-43d0
   11. Once API added in API manager. Copy the API Instance ID. <br />
   12. Configure API Instance ID to auto discovery configuration in mule api. <br />
   13. Add basic authorization security policy to Customer API in policies section. <br />
-  14. Add Custom circuit breaker policy to apply circuit breaker design pattern on api <br />
+  14. Add Custom circuit breaker policy to apply circuit breaker design pattern on api https://github.com/voodisatish/circuit-breaker-custom-policy <br />
   15. Login to Runtime manager and deploy customer-api application. we can also use mule maven plugin to deploy api to cloud hub. <br />
         
   
